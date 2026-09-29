@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkVault & Connect</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            900: '#0b0f19',
+                            800: '#111827',
+                            700: '#1f293d',
+                            600: '#374151',
+                            accent: '#06b6d4',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            neon: '#22d3ee'
+                        }
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(6, 182, 212, 0.4)',
+                        'neon-pink': '0 0 15px rgba(236, 72, 153, 0.4)'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+        }
+        /* Hide scrollbars for clean UI */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-cyber-900 text-gray-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black pb-24 md:pb-0">
+
+    <!-- Header -->
+    <header class="glass-panel sticky top-0 z-50 border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center shadow-neon">
+                <i class="fa-solid fa-vault text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-wide glow-text">LinkVault <span class="text-cyan-400">&</span> Archive</h1>
+                <p class="text-xs text-gray-400">Vital Services & Resources Hub</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="openAddModal()" class="px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-semibold text-xs rounded-lg shadow-neon transition-all flex items-center space-x-1">
+                <i class="fa-solid fa-plus text-black"></i>
+                <span class="hidden sm:inline">Add Link</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- ARCHIVES SECTION -->
+        <section id="view-archives" class="space-y-6">
+            <!-- Search & Filter Bar -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-between items-center bg-cyber-800/60 p-4 rounded-2xl border border-gray-800">
+                <div class="relative w-full sm:w-96">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterLinks()" placeholder="Search links, services, or URLs..." 
+                        class="w-full pl-10 pr-4 py-2.5 bg-cyber-900 border border-gray-700 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-gray-200 placeholder-gray-500 transition-all">
+                </div>
+                
+                <div class="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto no-scrollbar py-1">
+                    <button onclick="filterCategory('all')" id="cat-btn-all" class="category-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-cyan-500 text-black transition-all whitespace-nowrap">All</button>
+                    <button onclick="filterCategory('Video Watching Services')" id="cat-btn-Video Watching Services" class="category-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-cyber-700 text-gray-300 hover:bg-gray-700 transition-all whitespace-nowrap">Videos</button>
+                    <button onclick="filterCategory('Messaging Services')" id="cat-btn-Messaging Services" class="category-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-cyber-700 text-gray-300 hover:bg-gray-700 transition-all whitespace-nowrap">Messaging</button>
+                    <button onclick="filterCategory('Sports Services')" id="cat-btn-Sports Services" class="category-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-cyber-700 text-gray-300 hover:bg-gray-700 transition-all whitespace-nowrap">Sports</button>
+                    <button onclick="filterCategory('News & Politics')" id="cat-btn-News & Politics" class="category-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-cyber-700 text-gray-300 hover:bg-gray-700 transition-all whitespace-nowrap">News</button>
+                </div>
+            </div>
+
+            <!-- Categories and Links Grid Container -->
+            <div id="linksContainer" class="space-y-8">
+                <!-- Dynamically populated categories -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Add Link Modal -->
+    <div id="addModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
+        <div class="glass-panel p-6 rounded-3xl max-w-md w-full border border-cyan-500/30 shadow-neon space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-square-plus text-cyan-400"></i>
+                    <span>Add New Vault Link</span>
+                </h3>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Service / Link Name</label>
+                    <input type="text" id="newTitle" placeholder="e.g. Netflix, GitHub..." 
+                        class="w-full px-4 py-2.5 bg-cyber-900 border border-gray-700 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-gray-200">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">URL (https://...)</label>
+                    <input type="text" id="newUrl" placeholder="https://example.com" 
+                        class="w-full px-4 py-2.5 bg-cyber-900 border border-gray-700 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-gray-200">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Category</label>
+                    <select id="newCategory" class="w-full px-4 py-2.5 bg-cyber-900 border border-gray-700 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-gray-200">
+                        <option value="Video Watching Services">Video Watching Services</option>
+                        <option value="Messaging Services">Messaging Services</option>
+                        <option value="Sports Services">Sports Services</option>
+                        <option value="News & Politics">News & Politics</option>
+                        <option value="Custom & Other">Custom & Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Description / Notes (Optional)</label>
+                    <input type="text" id="newDesc" placeholder="Brief note about this link..." 
+                        class="w-full px-4 py-2.5 bg-cyber-900 border border-gray-700 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-gray-200">
+                </div>
+            </div>
+
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeAddModal()" class="flex-1 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold rounded-xl text-sm transition-all">Cancel</button>
+                <button onclick="saveNewLink()" class="flex-1 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-xl text-sm shadow-neon transition-all">Save Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass-panel px-4 py-3 rounded-xl border border-cyan-500/40 shadow-neon flex items-center space-x-3 text-sm text-white">
+            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+            <span id="toastMsg">Link copied to clipboard!</span>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Code -->
+    <script>
+        // Default Link Data based on user request
+        const defaultLinks = [
+            // Video Watching Services
+            { id: 'v1', title: 'Twitch', url: 'https://twitchnosub.com', category: 'Video Watching Services', desc: 'Alternative Twitch viewer & stream service', icon: 'fa-brands fa-twitch', color: 'text-purple-400 bg-purple-500/10 border-purple-500/30' },
+            { id: 'v2', title: 'YouTube', url: 'https://www.watchkin.com', category: 'Video Watching Services', desc: 'Secure video watching & sharing player', icon: 'fa-brands fa-youtube', color: 'text-red-400 bg-red-500/10 border-red-500/30' },
+            { id: 'v3', title: 'Twitter/X', url: 'https://twitterviewer.net', category: 'Video Watching Services', desc: 'Microblogging and media feed viewer', icon: 'fa-brands fa-twitter', color: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30' },
+            { id: 'v4', title: 'Reddit', url: 'https://www.peekstr.com', category: 'Video Watching Services', desc: 'Community discussions & media previewer', icon: 'fa-brands fa-reddit', color: 'text-orange-400 bg-orange-500/10 border-orange-500/30' },
+
+            // Messaging Services
+            { id: 'm1', title: 'Google Chat', url: 'https://chat.google.com', category: 'Messaging Services', desc: 'Direct secure team and personal messaging', icon: 'fa-solid fa-comments', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
+
+            // Sports Services
+            { id: 's1', title: 'Football/Sports', url: 'https://sportsfeed24.st', category: 'Sports Services', desc: 'Live scores, feeds and match updates', icon: 'fa-solid fa-futbol', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
+            { id: 's2', title: 'LiveFootballTV', url: 'https://www.live-footballontv.com', category: 'Sports Services', desc: 'Match fixture guides and TV schedules', icon: 'fa-solid fa-tv', color: 'text-teal-400 bg-teal-500/10 border-teal-500/30' },
+
+            // News & Politics
+            { id: 'n1', title: 'Sky News', url: 'https://news.sky.com', category: 'News & Politics', desc: 'Breaking news and global headlines', icon: 'fa-solid fa-newspaper', color: 'text-sky-400 bg-sky-500/10 border-sky-500/30' },
+            { id: 'n2', title: 'BBC News', url: 'https://www.bbc.co.uk/news', category: 'News & Politics', desc: 'Trusted international news and reports', icon: 'fa-solid fa-globe', color: 'text-rose-400 bg-rose-500/10 border-rose-500/30' },
+            { id: 'n3', title: 'BritainVotesNow', url: 'https://britain.votes.now', category: 'News & Politics', desc: 'UK electoral insights and poll tracker', icon: 'fa-solid fa-check-to-slot', color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30' }
+        ];
+
+        // State Management
+        let links = JSON.parse(localStorage.getItem('vault_links')) || defaultLinks;
+        let currentCategoryFilter = 'all';
+        let searchQuery = '';
+
+        // Initialize application on load
+        window.onload = function() {
+            renderLinks();
+        };
+
+        // Render Categorized Links
+        function renderLinks() {
+            const container = document.getElementById('linksContainer');
+            container.innerHTML = '';
+
+            // Filter links based on search and category
+            const filtered = links.filter(l => {
+                const matchesCat = currentCategoryFilter === 'all' || l.category === currentCategoryFilter;
+                const matchesSearch = l.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      l.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      (l.desc && l.desc.toLowerCase().includes(searchQuery.toLowerCase()));
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-panel p-12 rounded-2xl text-center space-y-3">
+                        <i class="fa-solid fa-folder-open text-4xl text-gray-600"></i>
+                        <p class="text-gray-400 text-sm">No links found matching your criteria.</p>
+                        <button onclick="openAddModal()" class="px-4 py-2 bg-cyan-500 text-black text-xs font-bold rounded-xl">Add Custom Link</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by category
+            const categories = [...new Set(filtered.map(l => l.category))];
+
+            categories.forEach(cat => {
+                const catLinks = filtered.filter(l => l.category === cat);
+                
+                const section = document.createElement('div');
+                section.className = "space-y-4";
+                section.innerHTML = `
+                    <div class="flex items-center space-x-3 border-b border-gray-800 pb-2">
+                        <h3 class="font-bold text-base text-cyan-400 tracking-wide">${cat}</h3>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-cyber-700 text-gray-300 font-mono">${catLinks.length}</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="cat-grid-${sanitizeId(cat)}">
+                    </div>
+                `;
+                container.appendChild(section);
+
+                const grid = document.getElementById(`cat-grid-${sanitizeId(cat)}`);
+                catLinks.forEach(link => {
+                    const card = document.createElement('div');
+                    card.className = "glass-panel p-4 rounded-2xl border border-gray-800 hover:border-cyan-500/50 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden";
+                    
+                    let iconClass = link.icon || 'fa-solid fa-link';
+                    let badgeColor = link.color || 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30';
+
+                    card.innerHTML = `
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div class="w-10 h-10 rounded-xl ${badgeColor} border flex items-center justify-center text-lg shrink-0">
+                                    <i class="${iconClass}"></i>
+                                </div>
+                                <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="copyToClipboard('${link.url}')" title="Copy URL" class="w-8 h-8 rounded-lg bg-cyber-700 hover:bg-cyan-500 hover:text-black text-gray-300 flex items-center justify-center transition-all text-xs">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                    <button onclick="deleteLink('${link.id}')" title="Delete Link" class="w-8 h-8 rounded-lg bg-cyber-700 hover:bg-red-500 hover:text-white text-gray-300 flex items-center justify-center transition-all text-xs">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base tracking-wide group-hover:text-cyan-300 transition-colors">${link.title}</h4>
+                                <p class="text-xs text-gray-400 line-clamp-1 mt-0.5">${link.desc || link.url}</p>
+                            </div>
+                        </div>
+                        <div class="pt-4 mt-4 border-t border-gray-800/80 flex items-center justify-between">
+                            <span class="text-[10px] text-gray-500 truncate max-w-[140px] font-mono">${link.url.replace(/^https?:\/\//, '')}</span>
+                            <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs rounded-xl shadow-neon transition-all flex items-center space-x-1">
+                                <span>Launch</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            });
+        }
+
+        function sanitizeId(str) {
+            return str.replace(/[^a-zA-Z0-9]/g, '_');
+        }
+
+        function filterCategory(cat) {
+            currentCategoryFilter = cat;
+            document.querySelectorAll('.category-pill').forEach(btn => {
+                btn.className = "category-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-cyber-700 text-gray-300 hover:bg-gray-700 transition-all whitespace-nowrap";
+            });
+            document.getElementById(`cat-btn-${cat}`).className = "category-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-cyan-500 text-black transition-all whitespace-nowrap";
+            renderLinks();
+        }
+
+        function filterLinks() {
+            searchQuery = document.getElementById('searchInput').value;
+            renderLinks();
+        }
+
+        // Add / Delete Link operations
+        function openAddModal() {
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newUrl').value = '';
+            document.getElementById('newDesc').value = '';
+        }
+
+        function saveNewLink() {
+            const title = document.getElementById('newTitle').value.trim();
+            const url = document.getElementById('newUrl').value.trim();
+            const category = document.getElementById('newCategory').value;
+            const desc = document.getElementById('newDesc').value.trim();
+
+            if (!title || !url) {
+                showToast("Please provide both title and URL.");
+                return;
+            }
+
+            let formattedUrl = url;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                formattedUrl = 'https://' + url;
+            }
+
+            const newLinkObj = {
+                id: 'link_' + Date.now(),
+                title: title,
+                url: formattedUrl,
+                category: category,
+                desc: desc || 'Custom added vault link',
+                icon: 'fa-solid fa-bookmark',
+                color: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30'
+            };
+
+            links.push(newLinkObj);
+            localStorage.setItem('vault_links', JSON.stringify(links));
+            closeAddModal();
+            renderLinks();
+            showToast("New link successfully added to archive!");
+        }
+
+        function deleteLink(id) {
+            links = links.filter(l => l.id !== id);
+            localStorage.setItem('vault_links', JSON.stringify(links));
+            renderLinks();
+            showToast("Link removed from archive.");
+        }
+
+        // Copy to clipboard fallback
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("URL copied to clipboard!");
+                }).catch(() => {
+                    fallbackCopyText(text);
+                });
+            } else {
+                fallbackCopyText(text);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("URL copied to clipboard!");
+            } catch (err) {
+                showToast("Failed to copy URL.");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
